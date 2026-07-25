@@ -15,6 +15,10 @@ export const iso = (d) => {
   return `${y}-${m}-${day}`;
 };
 export const monthKey = (d) => iso(d).slice(0, 7);
+export const parseLocal = (s) => {
+  const [y, m, day] = s.split('-').map(Number);
+  return new Date(y, m - 1, day);
+};
 export const fmt = (n) => `RM${Number(n).toFixed(2)}`;
 export const prettyDate = (d) =>
   new Date(d).toLocaleDateString('en-MY', { day: 'numeric', month: 'short' });
@@ -200,6 +204,7 @@ export function weekRange(offset) {
   start.setDate(start.getDate() + offset * 7);
   const end = new Date(start);
   end.setDate(end.getDate() + 6);
+  end.setHours(23, 59, 59, 999);
   return { start, end };
 }
 
@@ -212,14 +217,14 @@ export function monthOf(offset) {
 
 export function txnsInWeek(txns, start, end) {
   return txns.filter((t) => {
-    const d = new Date(t.date);
+    const d = parseLocal(t.date);
     return d >= start && d <= end && t.account === 'allowance';
   });
 }
 
 export function flowsInWeek(flows, start, end) {
   return flows.filter((f) => {
-    const d = new Date(f.date);
+    const d = parseLocal(f.date);
     return d >= start && d <= end;
   });
 }
